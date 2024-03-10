@@ -138,9 +138,9 @@ function Login() {
                     </div>
 
                     <p className="mt-10 text-center text-sm text-gray-500">
-                        Not a member?{' '}
+                        No account?{' '}
                         <a href="#" className="font-semibold leading-6 text-brand-600 hover:text-brand-500">
-                            Start a 14 day free trial
+                            Sign up here.
                         </a>
                     </p>
                 </div>
