@@ -27,5 +27,6 @@ export default {
   plugins: [
     require('@tailwindcss/forms'),
   ],
+  important: 'button',
 }
 
