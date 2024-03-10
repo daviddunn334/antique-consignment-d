@@ -228,7 +228,7 @@ export default function ConsignerLanding() {
                                 </div>
                                 <div className="py-6">
                                     <a
-                                        href="#"
+                                        href="/login"
                                         className="-mx-3 block rounded-lg px-3 text-base font-semibold leading-7 text-gray-900 py-2.5 hover:bg-gray-50"
                                     >
                                         Log in
@@ -278,7 +278,7 @@ export default function ConsignerLanding() {
                             </p>
                             <div className="mt-10 flex items-center gap-x-6">
                                 <a
-                                    href="#"
+                                    href="/login"
                                     className="rounded-md bg-brand-700 text-sm font-semibold text-white shadow-sm px-3.5 py-2.5 hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
                                 >
                                     Get started
