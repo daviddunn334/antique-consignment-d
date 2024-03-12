@@ -1,8 +1,7 @@
 import {useState, useEffect, createContext} from 'react'
-import {createClient, Session} from '@supabase/supabase-js'
+import {Session} from '@supabase/supabase-js'
 import {App} from '../main.tsx'
-
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+import {supabase} from '../lib/supabase'
 export const UserContext = createContext<User | undefined>(undefined);
 
 export type User = {
