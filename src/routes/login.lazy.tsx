@@ -28,7 +28,7 @@ function Login() {
                             supabaseClient={supabase}
                             providers={['google']}
                             theme="default"
-                            redirectTo={import.meta.env.VITE_BASE_URL + "/dashboard"}
+                            redirectTo={import.meta.env.VITE_BASE_URL + "dashboard"}
                             socialLayout="horizontal"
                             appearance={{
                                 theme: ThemeSupa,
