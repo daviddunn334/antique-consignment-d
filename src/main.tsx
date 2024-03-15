@@ -31,7 +31,6 @@ if (!rootElement.innerHTML) {
 
 export function App() {
     const user = useContext(UserContext)
-    console.log('user in app', user)
     return (
         <RouterProvider router={router} context={{ user: user }} />
     )

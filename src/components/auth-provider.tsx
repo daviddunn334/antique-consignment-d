@@ -2,13 +2,15 @@ import {useState, useEffect, createContext} from 'react'
 import {Session} from '@supabase/supabase-js'
 import {App} from '../main.tsx'
 import {supabase} from '../lib/supabase'
-export const UserContext = createContext<User | undefined>(undefined);
 
 export type User = {
     id?: string
     email?: string
     role?: string
+    imageUrl?: string
 }
+
+export const UserContext = createContext<User | undefined>(undefined);
 
 export default function AuthProvider() {
     const [session, setSession] = useState()
