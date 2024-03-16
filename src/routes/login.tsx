@@ -1,8 +1,8 @@
-import {createFileRoute, redirect, Router, useRouter} from '@tanstack/react-router'
+import {createFileRoute, redirect} from '@tanstack/react-router'
 import {Auth} from "@supabase/auth-ui-react";
 import {supabase} from "../lib/supabase";
 import {ThemeSupa} from "@supabase/auth-ui-shared";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import {UserContext} from "../components/auth-provider.tsx";
 import {ArrowLeftIcon} from "@heroicons/react/24/solid";
 

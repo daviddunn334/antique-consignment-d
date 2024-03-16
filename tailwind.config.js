@@ -4,28 +4,26 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  theme: {
-    extend: {
-      colors: {
-        brand: {
-          '50': '#f4f7f9',
-          '100': '#eaf2f5',
-          '200': '#d9e5ec',
-          '300': '#c1d4e0',
-          '400': '#a8bdd1',
-          '500': '#91a8c3',
-          'DEFAULT': '#91a8c3',
-          '600': '#7289ad',
-          '700': '#677a9b',
-          '800': '#55647e',
-          '900': '#495566',
-          '950': '#2b313b',
+  daisyui: {
+    themes: [
+      {
+        eden: {
+          "primary": "hsl(211, 25%, 51%)",
+          "secondary": "hsl(31, 25%, 51%)",
+          "accent": "hsl(203, 93%, 51%)",
+          "neutral": "hsl(211, 25%, 30%)",
+          "base-100": "hsl(211, 25%, 100%)",
+          "base-200": "hsl(211, 25%, 98%)",
+          "base-300": "hsl(211, 25%, 96%)",
         },
       },
-    },
+      "dark",
+      "light",
+    ],
   },
   plugins: [
     require('@tailwindcss/forms'),
+    require("daisyui"),
   ],
 }
 

@@ -279,7 +279,7 @@ export default function ConsignerLanding() {
                             <div className="mt-10 flex items-center gap-x-6">
                                 <a
                                     href="/login"
-                                    className="rounded-md bg-brand-700 text-sm font-semibold text-white shadow-sm px-3.5 py-2.5 hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                                    className="rounded-md bg-accent text-sm font-semibold text-white shadow-sm px-3.5 py-2.5 hover:bg-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/80"
                                 >
                                     Get started
                                 </a>
@@ -325,7 +325,7 @@ export default function ConsignerLanding() {
                                 <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                                     Antique consignment shouldn't be a chore.
                                     <br /><br />
-                                    We make it <span className="text-brand">fun</span>.
+                                    We make it <span className="text-accent">fun</span>.
                                 </h2>
                             </div>
                             <img
@@ -340,7 +340,7 @@ export default function ConsignerLanding() {
                                     {primaryFeatures.map((feature) => (
                                         <div key={feature.name} className="relative">
                                             <dt className="ml-9 inline-block font-semibold text-white">
-                                                <feature.icon className="absolute top-1 left-1 h-5 w-5 text-brand" aria-hidden="true" />
+                                                <feature.icon className="absolute top-1 left-1 h-5 w-5 text-primary" aria-hidden="true" />
                                                 {feature.name}
                                             </dt>{' '}
                                             <dd className="inline">{feature.description}</dd>
@@ -420,7 +420,7 @@ export default function ConsignerLanding() {
                         {/*Content*/}
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
                             <div className="mx-auto max-w-xl sm:text-center">
-                                <h2 className="text-lg font-semibold leading-8 tracking-tight text-brand-700">Testimonials</h2>
+                                <h2 className="text-lg font-semibold leading-8 tracking-tight text-accent/80">Testimonials</h2>
                                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                                     Antique consigners love using Eden.
                                 </p>
