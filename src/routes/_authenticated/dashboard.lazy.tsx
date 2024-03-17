@@ -3,7 +3,7 @@ import {BanknotesIcon} from "@heroicons/react/24/solid";
 import ProductForm, {ProductFormData} from "../../components/productForm.tsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {supabase} from "../../lib/supabase.ts";
-import Item, {defaultItemImageUrl} from "../../lib/models/item.ts";
+import Item, {getDefaultImage} from "../../lib/models/item.ts";
 import {User, UserContext} from "../../components/auth-provider.tsx";
 import {useContext} from "react";
 
@@ -131,7 +131,7 @@ function Dashboard() {
                 <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
                     {myItemsQuery.data?.map(item => (
                             <div className="card card-compact max-w-96 bg-base-200 shadow-xl hover:attention" key={item.id}>
-                                <figure><img src={item.imageUrl || defaultItemImageUrl} alt="" /></figure>
+                                <figure className="h-60"><img className="object-cover h-full w-full" src={item.imageUrl || getDefaultImage()} alt="" /></figure>
                                 <div className="card-body">
                                     <h2 className="card-title w-full flex space-between">
                                         {item.name}
