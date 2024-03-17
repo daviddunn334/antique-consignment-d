@@ -13,8 +13,8 @@ export default {
           "accent": "hsl(203, 93%, 51%)",
           "neutral": "hsl(211, 25%, 30%)",
           "base-100": "hsl(211, 25%, 100%)",
-          "base-200": "hsl(211, 25%, 98%)",
-          "base-300": "hsl(211, 25%, 96%)",
+          "base-200": "hsl(211, 25%, 97%)",
+          "base-300": "hsl(211, 25%, 94%)",
         },
       },
       "dark",
@@ -22,7 +22,7 @@ export default {
     ],
   },
   plugins: [
-    require('@tailwindcss/forms'),
+    require("@tailwindcss/typography"),
     require("daisyui"),
   ],
 }

@@ -1,50 +1,89 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
-import Item from "../../lib/models/item.ts";
-import {BanknotesIcon, PencilSquareIcon} from "@heroicons/react/24/solid";
-// import {User, UserContext} from "../../components/auth-provider.tsx";
-// import {useContext} from "react";
+import {BanknotesIcon} from "@heroicons/react/24/solid";
+import ProductForm, {ProductFormData} from "../../components/productForm.tsx";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {supabase} from "../../lib/supabase.ts";
+import Item, {defaultItemImageUrl} from "../../lib/models/item.ts";
+import {User, UserContext} from "../../components/auth-provider.tsx";
+import {useContext} from "react";
 
 export const Route = createLazyFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
+
+function showAddItemModal() {
+    // @ts-ignore
+    document.getElementById('addItemModal')?.showModal();
+}
 
 const filters = [
     { name: 'Active', href: '#', current: true },
     { name: 'Sold', href: '#', current: false },
 ]
 
-const items: Item[] = [
-    {
-        id: "id",
-        name: "name",
-        price: 0,
-        description: "This is my super super super cool item!",
-        imageUrl: "https://www.franciscosegarra.com/wp-content/uploads/2019/11/antique-decorative-items-francisco-segarra.jpg",
-        consignerCost: 0,
-        sold: false,
-        boothId: '',
-        categories: []
-    },
-]
+const useMyItems = (user: User) => useQuery({
+    queryKey: ['myItems'],
+    queryFn: async () => (await supabase.from('inventory_item').select('*').eq('consigner_id', user.id).throwOnError()).data,
+    select: (data): Item[] => data?.map(supaItem => {
+            return {
+                id: supaItem.id,
+                name: supaItem.name,
+                price: supaItem.price,
+                consignerCost: supaItem.cost,
+                description: supaItem.description,
+                imageUrl: null,
+                sold: supaItem.sold,
+                boothId: supaItem.booth_id,
+                categories: [],
+            }})
+        || []
+})
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
 function Dashboard() {
+    const user: User | undefined = useContext(UserContext)
+    if (!user) throw new Error('User not found')
 
-  // const user: User | undefined = useContext(UserContext)
+    const queryClient = useQueryClient()
+    const myItemsQuery = useMyItems(user)
 
+    const addItemMutation = useMutation({
+        mutationFn: async (data: ProductFormData & { user: User }) =>
+            await supabase.from('inventory_item').insert([
+                {
+                    name: data.name,
+                    price: data.price || null,
+                    cost: data.consignerCost || null,
+                    description: data.description,
+                    consigner_id: data.user.id,
+                }
+            ]).select().single().throwOnError(),
+        onSuccess: (response) => {
+            queryClient.setQueryData(['myItems'], (oldData: any[]) => {
+                return oldData ? [...oldData, response.data] : [response.data]
+            })
+            document.getElementById('addItemModal')?.removeAttribute('open')
+        },
+        onError: (error) => {
+            console.error(error)
+        }
+    })
+
+    // @ts-ignore
     return (
             <div className="mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 {/*Items section header*/}
-                <div className="relative border-b border-neutral pb-5 sm:pb-0">
+                <div className="relative border-b border-base-content pb-5 sm:pb-0">
                     <div className="md:flex md:items-center md:justify-between">
                         <h3 className="font-semibold leading-6 text-primary">My Items</h3>
                         <div className="mt-3 flex md:absolute md:right-0 md:top-3 md:mt-0">
                             <button
                                 type="button"
                                 className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary/80"
+                                onClick={showAddItemModal}
                             >
                                 Add Item
                             </button>
@@ -89,10 +128,10 @@ function Dashboard() {
                 </div>
 
                 {/*Items section grid*/}
-                <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4">
-                    {items.map(item => (
-                            <div className="card card-compact max-w-96 bg-base-200 shadow-xl">
-                                <figure><img src={item.imageUrl}  alt="" /></figure>
+                <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+                    {myItemsQuery.data?.map(item => (
+                            <div className="card card-compact max-w-96 bg-base-200 shadow-xl hover:attention" key={item.id}>
+                                <figure><img src={item.imageUrl || defaultItemImageUrl} alt="" /></figure>
                                 <div className="card-body">
                                     <h2 className="card-title w-full flex space-between">
                                         {item.name}
@@ -100,7 +139,6 @@ function Dashboard() {
                                     <div className="flex justify-between">
                                         <div className="badge badge-outline">Booth 1</div>
                                         <div className="flex gap-2 justify-end">
-                                            <PencilSquareIcon className="h-8 w-8 hover:text-accent hover:scale-[1.15]" />
                                             <BanknotesIcon className="h-8 w-8 hover:text-green-600 hover:scale-[1.15]" />
                                         </div>
                                     </div>
@@ -108,6 +146,17 @@ function Dashboard() {
                             </div>
                     ))}
                 </ul>
+                <dialog id="addItemModal" className="modal">
+                    <div className="modal-box w-11/12 max-w-5xl">
+                        <ProductForm handleData={(data) => addItemMutation.mutate({...data, user: user})}></ProductForm>
+                        <div className="modal-action">
+                            <form method="dialog" className="modal-backdrop">
+                                {/* if there is a button, it will close the modal */}
+                                <button className="btn">Close</button>
+                            </form>
+                        </div>
+                    </div>
+                </dialog>
             </div>
     )
 }

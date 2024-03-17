@@ -54,8 +54,8 @@ export default function LoginPage() {
                                     variables: {
                                         default: {
                                             colors: {
-                                                brand: '#91a8c3',
-                                                brandAccent: '#677a9b',
+                                                brand: 'hsl(211, 25%, 51%)',
+                                                brandAccent: 'hsl(203, 93%, 51%)',
                                             },
                                         },
                                     },

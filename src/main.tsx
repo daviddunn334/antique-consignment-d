@@ -5,6 +5,7 @@ import { routeTree } from './routeTree.gen'
 import NotFound from "./pages/404-not-found.tsx";
 import {useContext} from "react";
 import AuthProvider, {UserContext} from "./components/auth-provider.tsx";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 // Set up a Router instance
 const router = createRouter({
@@ -16,6 +17,8 @@ const router = createRouter({
     }
 })
 
+const queryClient = new QueryClient();
+
 // Register things for typesafety
 declare module '@tanstack/react-router' {
     interface Register {
@@ -26,7 +29,12 @@ declare module '@tanstack/react-router' {
 const rootElement = document.getElementById('app')!
 if (!rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement)
-    root.render(<AuthProvider />)
+    root.render(
+        <QueryClientProvider client={queryClient}>
+            {/*<ReactQueryDevtools initialIsOpen={false} />*/}
+            <AuthProvider />
+        </QueryClientProvider>
+    )
 }
 
 export function App() {

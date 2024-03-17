@@ -4,7 +4,7 @@ import {App} from '../main.tsx'
 import {supabase} from '../lib/supabase'
 
 export type User = {
-    id?: string
+    id: string
     email?: string
     role?: string
     imageUrl?: string
@@ -38,7 +38,7 @@ export default function AuthProvider() {
             return undefined
         }
         return {
-            id: session?.user?.id,
+            id: session.user.id,
             email: session?.user?.email,
             role: session?.user?.role,
         }
