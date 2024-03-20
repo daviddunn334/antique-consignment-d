@@ -90,8 +90,8 @@ function Dashboard() {
         onSuccess: (response) => {
             queryClient.setQueryData(['myItems'], (oldData: any[]) => {
                 if (!response.data || !oldData) throw new Error('No data returned from editItemMutation, or no data in my items query.')
-                response.data.imageUrl ??= getDefaultImage()
                 const indexOfItem = oldData.findIndex(i => i.id === response.data.id)
+                response.data.imageUrl ??= oldData[indexOfItem].imageUrl || getDefaultImage()
                 return [...oldData.slice(0, indexOfItem), response.data, ...oldData.slice(indexOfItem + 1)]
             });
             (document.getElementById('editItemModal') as HTMLDialogElement).close()
