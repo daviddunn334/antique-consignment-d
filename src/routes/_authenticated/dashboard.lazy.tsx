@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
-import {BanknotesIcon} from "@heroicons/react/24/solid";
+import {BanknotesIcon, ClipboardDocumentListIcon, CurrencyDollarIcon} from "@heroicons/react/24/solid";
 import ProductForm, {ProductFormData} from "../../components/productForm.tsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {supabase} from "../../lib/supabase.ts";
@@ -114,7 +114,35 @@ function Dashboard() {
 
     // @ts-ignore
     return (
-            <div className="mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex flex-col">
+                {/*Stat Section*/}
+                <div className="stats stats-vertical md:stats-horizontal shadow-xl mb-8">
+                    <div className="stat">
+                        <div className="stat-figure text-secondary">
+                            <ClipboardDocumentListIcon className="h-10 w-10" />
+                        </div>
+                        <div className="stat-title">Items Procured</div>
+                        <div className="stat-value">{myItemsQuery.data?.length || 0}</div>
+                        <div className="stat-desc">How many items you've gotten!</div>
+                    </div>
+                    <div className="stat">
+                        <div className="stat-figure text-secondary">
+                            <CurrencyDollarIcon className="h-10 w-10" />
+                        </div>
+                        <div className="stat-title">Combined Price Tags</div>
+                        <div className="stat-value">{myItemsQuery.data?.reduce((prices, i) => prices + i.price, 0) || 0}</div>
+                        <div className="stat-desc">You'll get this if everything sells.</div>
+                    </div>
+                    <div className="stat">
+                        <div className="stat-figure text-secondary">
+                            <BanknotesIcon className="h-10 w-10" />
+                        </div>
+                        <div className="stat-title">Profit</div>
+                        <div className="stat-value">{myItemsQuery.data?.reduce((profit, i) => (profit + i.price) - i.consignerCost, 0) || 0}</div>
+                        <div className="stat-desc">If everything sells.</div>
+                    </div>
+                </div>
+
                 {/*Items section header*/}
                 <div className="relative border-b border-base-content pb-5 sm:pb-0">
                     <div className="md:flex md:items-center md:justify-between">
