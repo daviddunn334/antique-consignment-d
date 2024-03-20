@@ -310,7 +310,7 @@ export default function ConsignerLanding() {
                                     transform="translate(24 24)"
                                     clipPath="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)"
                                 >
-                                    <img src="https://assets.uigarage.net/content/uploads/2023/04/Mercari_-_Onboarding.mp4.mp45f55.jpg" alt="" />
+                                    <img src="https://i.imgur.com/rIheaYa.png" alt="" />
                                 </foreignObject>
                             </svg>
                         </div>
@@ -329,7 +329,7 @@ export default function ConsignerLanding() {
                                 </h2>
                             </div>
                             <img
-                                src="https://i.imgur.com/SmNMse2.png"
+                                src="https://i.imgur.com/Tdgv9TS.png"
                                 alt="Product screenshot"
                                 className="relative -z-20 min-w-full max-w-xl rounded-xl shadow-xl ring-1 ring-white/10 lg:w-[64rem] lg:row-span-4 lg:max-w-none"
                                 width={2432}
