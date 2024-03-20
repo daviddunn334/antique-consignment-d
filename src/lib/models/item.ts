@@ -1,12 +1,12 @@
 export default interface Item {
   id: string;
   name: string;
-  price: number | null;
-  consignerCost: number | null;
-  description: string | null;
-  imageUrl: string | null;
+  price: number;
+  consignerCost: number;
+  description: string;
+  imageUrl: string;
   sold: boolean;
-  boothId: string | null;
+  boothId: string;
   categories: string[];
 }
 

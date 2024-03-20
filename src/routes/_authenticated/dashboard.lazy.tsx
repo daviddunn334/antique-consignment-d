@@ -5,16 +5,11 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {supabase} from "../../lib/supabase.ts";
 import Item, {getDefaultImage} from "../../lib/models/item.ts";
 import {User, UserContext} from "../../components/auth-provider.tsx";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 
 export const Route = createLazyFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
-
-function showAddItemModal() {
-    // @ts-ignore
-    document.getElementById('addItemModal')?.showModal();
-}
 
 const filters = [
     { name: 'Active', href: '#', current: true },
@@ -23,17 +18,22 @@ const filters = [
 
 const useMyItems = (user: User) => useQuery({
     queryKey: ['myItems'],
-    queryFn: async () => (await supabase.from('inventory_item').select('*').eq('consigner_id', user.id).throwOnError()).data,
+    queryFn: async () => {
+        const data = (await supabase.from('inventory_item').select('*').eq('consigner_id', user.id).throwOnError()).data
+        data?.forEach((item) => item.imageUrl = item.imageUrl || getDefaultImage())
+        return data
+    },
     select: (data): Item[] => data?.map(supaItem => {
+        if (!supaItem.imageUrl) throw new Error('No default image set');
             return {
                 id: supaItem.id,
                 name: supaItem.name,
                 price: supaItem.price,
                 consignerCost: supaItem.cost,
                 description: supaItem.description,
-                imageUrl: null,
+                imageUrl: supaItem.imageUrl,
                 sold: supaItem.sold,
-                boothId: supaItem.booth_id,
+                boothId: supaItem.booth_id || "",
                 categories: [],
             }})
         || []
@@ -55,22 +55,62 @@ function Dashboard() {
             await supabase.from('inventory_item').insert([
                 {
                     name: data.name,
-                    price: data.price || null,
-                    cost: data.consignerCost || null,
+                    price: data.price,
+                    cost: data.consignerCost,
                     description: data.description,
                     consigner_id: data.user.id,
                 }
             ]).select().single().throwOnError(),
         onSuccess: (response) => {
             queryClient.setQueryData(['myItems'], (oldData: any[]) => {
+                if (!response.data) throw new Error('No data returned from addItemMutation')
+                response.data.imageUrl ??= getDefaultImage()
                 return oldData ? [...oldData, response.data] : [response.data]
-            })
-            document.getElementById('addItemModal')?.removeAttribute('open')
+            });
+            (document.getElementById('addItemModal') as HTMLDialogElement).close()
         },
         onError: (error) => {
             console.error(error)
         }
     })
+    const editItemMutation= useMutation({
+        mutationFn: async (data: ProductFormData & { user: User }) => {
+            if (!data.id) throw new Error('Item id is required')
+            return supabase.from('inventory_item').update({
+                    id: data.id,
+                    name: data.name,
+                    price: data.price,
+                    cost: data.consignerCost,
+                    description: data.description,
+                    consigner_id: data.user.id,
+            })
+            .eq('id', data.id)
+            .select().single().throwOnError()
+        },
+        onSuccess: (response) => {
+            queryClient.setQueryData(['myItems'], (oldData: any[]) => {
+                if (!response.data || !oldData) throw new Error('No data returned from editItemMutation, or no data in my items query.')
+                response.data.imageUrl ??= getDefaultImage()
+                const indexOfItem = oldData.findIndex(i => i.id === response.data.id)
+                return [...oldData.slice(0, indexOfItem), response.data, ...oldData.slice(indexOfItem + 1)]
+            });
+            (document.getElementById('editItemModal') as HTMLDialogElement).close()
+        },
+        onError: (error) => {
+            console.error(error)
+        }
+    })
+
+    const [itemToEdit, setItemToEdit] = useState<Item | undefined>(undefined)
+    function showEditItemModal(item: Item) {
+        setItemToEdit(item)
+        // @ts-ignore
+        document.getElementById('editItemModal')?.showModal();
+    }
+    function showAddItemModal() {
+        // @ts-ignore
+        document.getElementById('addItemModal')?.showModal();
+    }
 
     // @ts-ignore
     return (
@@ -130,8 +170,8 @@ function Dashboard() {
                 {/*Items section grid*/}
                 <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
                     {myItemsQuery.data?.map(item => (
-                            <div className="card card-compact max-w-96 bg-base-200 shadow-xl hover:attention" key={item.id}>
-                                <figure className="h-60"><img className="object-cover h-full w-full" src={item.imageUrl || getDefaultImage()} alt="" /></figure>
+                            <div onClick={() => showEditItemModal(item)} className="card card-compact max-w-96 bg-base-200 shadow-xl transition-all hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl" key={item.id}>
+                                <figure className="h-60"><img className="object-cover h-full w-full" src={item.imageUrl} alt="" /></figure>
                                 <div className="card-body">
                                     <h2 className="card-title w-full flex space-between">
                                         {item.name}
@@ -148,14 +188,27 @@ function Dashboard() {
                 </ul>
                 <dialog id="addItemModal" className="modal">
                     <div className="modal-box w-11/12 max-w-5xl">
-                        <ProductForm handleData={(data) => addItemMutation.mutate({...data, user: user})}></ProductForm>
-                        <div className="modal-action">
-                            <form method="dialog" className="modal-backdrop">
-                                {/* if there is a button, it will close the modal */}
-                                <button className="btn">Close</button>
-                            </form>
-                        </div>
+                        <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <ProductForm handleData={(data) => addItemMutation.mutate({...data, user})}></ProductForm>
                     </div>
+                    <form method="dialog" className="modal-backdrop">
+                        <button>close</button>
+                    </form>
+                </dialog>
+                <dialog id="editItemModal" className="modal">
+                    <div className="modal-box w-11/12 max-w-5xl">
+                        <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        </form>
+                        <ProductForm item={itemToEdit} handleData={(data) => editItemMutation.mutate({...data, user})}></ProductForm>
+                    </div>
+                    <form method="dialog" className="modal-backdrop">
+                        <button>close</button>
+                    </form>
                 </dialog>
             </div>
     )
