@@ -1,5 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router'
 import {BanknotesIcon, ClipboardDocumentListIcon, CurrencyDollarIcon} from "@heroicons/react/24/solid";
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ProductForm, {ProductFormData} from "../../components/productForm.tsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {supabase} from "../../lib/supabase.ts";
@@ -11,9 +12,15 @@ export const Route = createLazyFileRoute('/_authenticated/dashboard')({
   component: Dashboard,
 })
 
-const filters = [
-    { name: 'Active', href: '#', current: true },
-    { name: 'Sold', href: '#', current: false },
+
+type Filter = {
+    name: string,
+    current: boolean,
+    filter: (item: Item) => boolean
+}
+const filters: Filter[] = [
+    { name: 'Active', current: true, filter: (item: Item) => !item.sold },
+    { name: 'Sold', current: false, filter: (item: Item) => item.sold},
 ]
 
 const useMyItems = (user: User) => useQuery({
@@ -51,14 +58,14 @@ function Dashboard() {
     const myItemsQuery = useMyItems(user)
 
     const addItemMutation = useMutation({
-        mutationFn: async (data: ProductFormData & { user: User }) =>
+        mutationFn: async (data: ProductFormData & { userId: string }) =>
             await supabase.from('inventory_item').insert([
                 {
                     name: data.name,
                     price: data.price,
                     cost: data.consignerCost,
                     description: data.description,
-                    consigner_id: data.user.id,
+                    consigner_id: data.userId,
                 }
             ]).select().single().throwOnError(),
         onSuccess: (response) => {
@@ -74,7 +81,7 @@ function Dashboard() {
         }
     })
     const editItemMutation= useMutation({
-        mutationFn: async (data: ProductFormData & { user: User }) => {
+        mutationFn: async (data: any & { userId: string }) => {
             if (!data.id) throw new Error('Item id is required')
             return supabase.from('inventory_item').update({
                     id: data.id,
@@ -82,7 +89,8 @@ function Dashboard() {
                     price: data.price,
                     cost: data.consignerCost,
                     description: data.description,
-                    consigner_id: data.user.id,
+                    consigner_id: data.userId,
+                    sold: data?.sold || false,
             })
             .eq('id', data.id)
             .select().single().throwOnError()
@@ -102,6 +110,13 @@ function Dashboard() {
     })
 
     const [itemToEdit, setItemToEdit] = useState<Item | undefined>(undefined)
+    const [currentFilter, setCurrentFilter] = useState<Filter>(filters[0])
+
+    function toggleSold(e: any, item: Item) {
+        e.stopPropagation()
+        editItemMutation.mutate({...item, sold: !item.sold, userId: user?.id})
+    }
+
     function showEditItemModal(item: Item) {
         setItemToEdit(item)
         // @ts-ignore
@@ -166,29 +181,30 @@ function Dashboard() {
                                 id="current-tab"
                                 name="current-tab"
                                 className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary"
-                                defaultValue={filters.find((filter) => filter?.current)?.name}
+                                defaultValue={currentFilter.name}
+                                onChange={(e) => setCurrentFilter(filters.find(f => f.name === e.target.value) || filters[0])}
                             >
                                 {filters.map((filter) => (
-                                    <option key={filter.name}>{filter.name}</option>
+                                    <option key={filter.name} value={filter.name}>{filter.name}</option>
                                 ))}
                             </select>
                         </div>
                         <div className="hidden sm:block">
                             <nav className="-mb-px flex space-x-8">
                                 {filters.map((filter) => (
-                                    <a
+                                    <button
                                         key={filter.name}
-                                        href={filter.href}
                                         className={classNames(
-                                            filter.current
+                                            filter === currentFilter
                                                 ? 'border-primary text-primary'
                                                 : 'border-transparent text-base-content hover:border-base-content/80 hover:text-base-content/90',
                                             'whitespace-nowrap border-b-2 px-1 pb-4 text-sm font-medium'
                                         )}
-                                        aria-current={filter.current ? 'page' : undefined}
+                                        aria-current={filter === currentFilter ? 'page' : undefined}
+                                        onClick={() => setCurrentFilter(filter)}
                                     >
                                         {filter.name}
-                                    </a>
+                                    </button>
                                 ))}
                             </nav>
                         </div>
@@ -197,22 +213,36 @@ function Dashboard() {
 
                 {/*Items section grid*/}
                 <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-                    {myItemsQuery.data?.map(item => (
-                            <div onClick={() => showEditItemModal(item)} className="card card-compact max-w-96 bg-base-200 shadow-xl transition-all hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl" key={item.id}>
-                                <figure className="h-60"><img className="object-cover h-full w-full" src={item.imageUrl} alt="" /></figure>
-                                <div className="card-body">
-                                    <h2 className="card-title w-full flex space-between">
-                                        {item.name}
-                                    </h2>
-                                    <div className="flex justify-between">
-                                        <div className="badge badge-outline">Booth 1</div>
-                                        <div className="flex gap-2 justify-end">
-                                            <BanknotesIcon className="h-8 w-8 hover:text-green-600 hover:scale-[1.15]" />
+                    <TransitionGroup className="perspective-[1500px]">
+                    {myItemsQuery.data?.filter(currentFilter.filter).map(item => (
+                        <CSSTransition key={item.id} timeout={700} classNames={{
+                            exitActive: "rotate-y-[270deg]",
+                        }}>
+                            <div className="relative transition-transform transform-style-3d duration-700">
+                                <div onClick={() => showEditItemModal(item)} className="card backface-hidden card-compact max-w-96 bg-base-200 shadow-xl transition hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl" key={item.id}>
+                                    <figure className="h-60"><img className="object-cover h-full w-full" src={item.imageUrl} alt="" /></figure>
+                                    <div className="card-body">
+                                        <h2 className="card-title w-full flex space-between">
+                                            {item.name}
+                                        </h2>
+                                        <div className="flex justify-between">
+                                            <div className="badge badge-outline">Booth 1</div>
+                                            <div className="flex gap-2 justify-end">
+                                                    <button onClick={(e) => toggleSold(e, item)}>
+                                                        {!item.sold && <BanknotesIcon className="h-8 w-8 hover:text-green-600 hover:scale-[1.15]" />}
+                                                        {item.sold && <BanknotesIcon className="h-8 w-8 hover:text-red-600 hover:scale-[1.15]" />}
+                                                    </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div className={`card flex justify-center items-center absolute inset-0 transition duration-700 -rotate-y-180 backface-hidden ${item.sold ? 'bg-red-600':'bg-green-600'}`}>
+                                    <CurrencyDollarIcon className="h-24 w-24 text-white" />
+                                </div>
                             </div>
+                        </CSSTransition>
                     ))}
+                    </TransitionGroup>
                 </ul>
                 <dialog id="addItemModal" className="modal">
                     <div className="modal-box w-11/12 max-w-5xl">
@@ -220,7 +250,7 @@ function Dashboard() {
                             {/* if there is a button in form, it will close the modal */}
                             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                         </form>
-                        <ProductForm handleData={(data) => addItemMutation.mutate({...data, user})}></ProductForm>
+                        <ProductForm handleData={(data) => addItemMutation.mutate({...data, userId: user.id})}></ProductForm>
                     </div>
                     <form method="dialog" className="modal-backdrop">
                         <button>close</button>
@@ -232,14 +262,15 @@ function Dashboard() {
                             {/* if there is a button in form, it will close the modal */}
                             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                         </form>
-                        <ProductForm item={itemToEdit} handleData={(data) => editItemMutation.mutate({...data, user})}></ProductForm>
+                        <ProductForm item={itemToEdit} handleData={(data) => editItemMutation.mutate({...data, userId: user.id})}></ProductForm>
                     </div>
                     <form method="dialog" className="modal-backdrop">
                         <button>close</button>
                     </form>
                 </dialog>
+                <style>
+
+                </style>
             </div>
     )
 }
-
-
