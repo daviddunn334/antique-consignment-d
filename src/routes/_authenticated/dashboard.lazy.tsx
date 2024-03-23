@@ -203,11 +203,13 @@ function Dashboard() {
       {/*Items section header*/}
       <div className="relative border-b border-base-content pb-5 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
-          <h3 className="font-semibold leading-6 text-primary">My Items</h3>
+          <h3 className="font-semibold leading-6 text-base-content">
+            My Items
+          </h3>
           <div className="mt-3 flex md:absolute md:right-0 md:top-3 md:mt-0">
             <button
               type="button"
-              className="ml-3 inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary/80"
+              className="ml-3 inline-flex items-center rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent/80"
               onClick={showAddItemModal}
             >
               Add Item
@@ -222,7 +224,7 @@ function Dashboard() {
             <select
               id="current-tab"
               name="current-tab"
-              className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary"
+              className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-accent"
               defaultValue={currentFilter.name}
               onChange={(e) =>
                 setCurrentFilter(
@@ -244,7 +246,7 @@ function Dashboard() {
                   key={filter.name}
                   className={classNames(
                     filter === currentFilter
-                      ? "border-primary text-primary"
+                      ? "border-accent text-accent"
                       : "border-transparent text-base-content hover:border-base-content/80 hover:text-base-content/90",
                     "whitespace-nowrap border-b-2 px-1 pb-4 text-sm font-medium",
                   )}

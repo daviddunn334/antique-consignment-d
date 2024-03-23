@@ -33,7 +33,7 @@ export default function ItemsGrid({
           >
             <div
               onClick={() => showEditItemModal(item)}
-              className="card backface-hidden card-compact max-w-96 bg-base-200 shadow-xl hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl"
+              className="card backface-hidden card-compact max-w-96 bg-primary text-primary-content shadow-xl hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl"
               key={item.id}
             >
               <figure className="h-60">

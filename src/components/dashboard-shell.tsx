@@ -65,7 +65,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
                       <img
                         className="hidden h-8 w-auto lg:block"
                         src="https://i.imgur.com/RHsPcXa.png"
-                        alt="Eden"
+                        alt="Seed"
                       />
                     </div>
                     <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
@@ -75,7 +75,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
                           href={item.href}
                           className={classNames(
                             item.current
-                              ? "border-primary text-base-content"
+                              ? "border-accent text-base-content"
                               : "border-transparent text-base-content/90 hover:border-base-content/50 hover:text-base-content",
                             "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium",
                           )}
@@ -92,7 +92,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
                       <input
                         type="checkbox"
                         className="theme-controller hidden"
-                        value="dark"
+                        value="darkseed"
                         defaultChecked={theme === "dark"}
                         onChange={(e) =>
                           setTheme(e.target.checked ? "dark" : "light")
