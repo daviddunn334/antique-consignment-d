@@ -20,7 +20,7 @@ export type Database = {
           imageUrl: string | null
           name: string
           price: number
-          sold: boolean
+          sold_at: string | null
         }
         Insert: {
           booth_id?: string | null
@@ -32,7 +32,7 @@ export type Database = {
           imageUrl?: string | null
           name: string
           price: number
-          sold?: boolean
+          sold_at?: string | null
         }
         Update: {
           booth_id?: string | null
@@ -44,7 +44,7 @@ export type Database = {
           imageUrl?: string | null
           name?: string
           price?: number
-          sold?: boolean
+          sold_at?: string | null
         }
         Relationships: [
           {
