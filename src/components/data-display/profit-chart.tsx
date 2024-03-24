@@ -1,24 +1,9 @@
 import React, { useContext, useMemo } from "react";
 import { AxisOptions, Chart } from "react-charts";
-import Item from "../lib/models/item.ts";
-import { ThemeContext } from "./dashboard-shell.tsx";
+import Item from "../../lib/models/item.ts";
+import { ThemeContext } from "../dashboard-shell.tsx";
 
 type CumulativeAmount = { date: Date; amount: number };
-
-function getCumulativeSales(items: Item[]): CumulativeAmount[] {
-  // Filter to sold items
-  const soldItems = items.filter((item) => item.soldAt !== null) as Item[];
-  // Sort sold items by sold date
-  soldItems.sort((a, b) => a.soldAt!.getTime() - b.soldAt!.getTime());
-  // Calculate cumulative sales for each day
-  const cumulativeSales: CumulativeAmount[] = [];
-  let cumulativeAmount = 0;
-  soldItems.forEach((item) => {
-    cumulativeAmount += item.price;
-    cumulativeSales.push({ date: item.soldAt!, amount: cumulativeAmount });
-  });
-  return cumulativeSales;
-}
 
 function getCumulativeProfit(items: Item[]): CumulativeAmount[] {
   // Filter to sold items
@@ -35,17 +20,14 @@ function getCumulativeProfit(items: Item[]): CumulativeAmount[] {
   return cumulativeSales;
 }
 
-export default function SalesChart({ items }: { items: Item[] }) {
+export default function ProfitChart({ items }: { items: Item[] }) {
   const theme = useContext(ThemeContext);
   const data = useMemo(
     () => [
       {
-        label: "Sales",
-        data: getCumulativeSales(items),
-      },
-      {
         label: "Profit",
         data: getCumulativeProfit(items),
+        color: "#ffffff",
       },
     ],
     [items],
@@ -80,6 +62,7 @@ export default function SalesChart({ items }: { items: Item[] }) {
             data,
             primaryAxis,
             secondaryAxes,
+            defaultColors: ["hsl(97, 21%, 70%)"],
             dark: theme === "dark",
           }}
         />

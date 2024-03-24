@@ -4,13 +4,14 @@ import Item from "../../lib/models/item.ts";
 import { User, UserContext } from "../../components/auth-provider.tsx";
 import { useContext, useState } from "react";
 import ItemsGrid from "../../components/items-grid.tsx";
-import SalesChart from "../../components/sales-chart.tsx";
+import SalesChart from "../../components/data-display/sales-chart.tsx";
 import {
   useAddItemMutation,
   useEditItemMutation,
   useMyItems,
 } from "./-dashboardHooks.ts";
-import PersonalStats from "../../components/personal-stats.tsx";
+import PersonalStats from "../../components/data-display/personal-stats.tsx";
+import ProfitChart from "../../components/data-display/profit-chart.tsx";
 
 export const Route = createLazyFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -142,10 +143,15 @@ function Dashboard() {
       <h2 className="text-3xl font-bold leading-loose tracking-tight mt-4">
         Sales and profit
       </h2>
-      <div className="card bg-base-200 shadow-xl w-full h-[30rem] p-4">
-        <SalesChart
-          items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
-        ></SalesChart>
+      <div className="flex gap-8">
+        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
+          <SalesChart
+            items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
+          ></SalesChart>
+        </div>
+        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
+          <ProfitChart items={myItemsQuery.data || []}></ProfitChart>
+        </div>
       </div>
 
       <dialog id="addItemModal" className="modal">

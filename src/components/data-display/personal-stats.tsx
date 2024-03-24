@@ -3,7 +3,7 @@ import {
   ClipboardDocumentListIcon,
   CurrencyDollarIcon,
 } from "@heroicons/react/24/solid";
-import Item from "../lib/models/item.ts";
+import Item from "../../lib/models/item.ts";
 
 function calculateProfit(items: Item[]): string {
   const profitNumber = items.reduce((profit, i) => {
