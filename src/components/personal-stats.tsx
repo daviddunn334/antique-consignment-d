@@ -24,9 +24,11 @@ export default function PersonalStats({ items }: { items: Item[] }) {
         <div className="stat-figure text-secondary">
           <ClipboardDocumentListIcon className="h-10 w-10" />
         </div>
-        <div className="stat-title">Items Procured</div>
-        <div className="stat-value">{items.length || 0}</div>
-        <div className="stat-desc">How many items you've gotten!</div>
+        <div className="stat-title">Current Inventory</div>
+        <div className="stat-value">
+          {items.filter((i) => !i.soldAt).length || 0}
+        </div>
+        <div className="stat-desc">How much you've got to sell</div>
       </div>
       <div className="stat">
         <div className="stat-figure text-secondary">
@@ -39,7 +41,7 @@ export default function PersonalStats({ items }: { items: Item[] }) {
             .filter((i) => !i.soldAt)
             .reduce((prices, i) => prices + i.price, 0) || 0}
         </div>
-        <div className="stat-desc">You'll get this if everything sells.</div>
+        <div className="stat-desc">You'll get this if everything sells</div>
       </div>
       <div className="stat">
         <div className="stat-figure text-secondary">
@@ -51,7 +53,7 @@ export default function PersonalStats({ items }: { items: Item[] }) {
         >
           {profit}
         </div>
-        <div className="stat-desc">Total income minus total spent.</div>
+        <div className="stat-desc">Total income minus total spent</div>
       </div>
     </div>
   );
