@@ -5,7 +5,19 @@ import {
 } from "@heroicons/react/24/solid";
 import Item from "../lib/models/item.ts";
 
+function calculateProfit(items: Item[]): string {
+  const profitNumber = items.reduce((profit, i) => {
+    let newProfit = profit - i.consignerCost;
+    if (!!i.soldAt) newProfit += i.price;
+    return newProfit;
+  }, 0);
+  if (profitNumber < 0) return `-$${Math.abs(profitNumber)}`;
+  else return `$${profitNumber}`;
+}
+
 export default function PersonalStats({ items }: { items: Item[] }) {
+  const profit = calculateProfit(items);
+
   return (
     <div className="stats stats-vertical md:stats-horizontal shadow-xl mb-8">
       <div className="stat">
@@ -34,12 +46,12 @@ export default function PersonalStats({ items }: { items: Item[] }) {
           <BanknotesIcon className="h-10 w-10" />
         </div>
         <div className="stat-title">Profit</div>
-        <div className="stat-value">
-          $
-          {items.reduce((profit, i) => profit + i.price - i.consignerCost, 0) ||
-            0}
+        <div
+          className={`stat-value ${profit.includes("-") ? "text-red-400" : "text-green-600"}`}
+        >
+          {profit}
         </div>
-        <div className="stat-desc">If everything sells.</div>
+        <div className="stat-desc">Total income minus total spent.</div>
       </div>
     </div>
   );
