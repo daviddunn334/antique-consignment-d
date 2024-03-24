@@ -20,9 +20,12 @@ export default function PersonalStats({ items }: { items: Item[] }) {
         <div className="stat-figure text-secondary">
           <CurrencyDollarIcon className="h-10 w-10" />
         </div>
-        <div className="stat-title">Combined Price Tags</div>
+        <div className="stat-title">Active Listing Worth</div>
         <div className="stat-value">
-          {items.reduce((prices, i) => prices + i.price, 0) || 0}
+          $
+          {items
+            .filter((i) => !i.soldAt)
+            .reduce((prices, i) => prices + i.price, 0) || 0}
         </div>
         <div className="stat-desc">You'll get this if everything sells.</div>
       </div>
@@ -32,6 +35,7 @@ export default function PersonalStats({ items }: { items: Item[] }) {
         </div>
         <div className="stat-title">Profit</div>
         <div className="stat-value">
+          $
           {items.reduce((profit, i) => profit + i.price - i.consignerCost, 0) ||
             0}
         </div>
