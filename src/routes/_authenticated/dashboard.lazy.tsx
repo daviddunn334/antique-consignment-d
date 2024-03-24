@@ -63,15 +63,29 @@ function Dashboard() {
 
   // @ts-ignore
   return (
-    <div className="mt-8 mx-auto max-w-7xl sm:px-6 lg:px-8 flex flex-col">
+    <>
       {/*Stat Section*/}
       <PersonalStats items={myItemsQuery.data || []}></PersonalStats>
 
+      <h2 className="text-3xl font-bold tracking-tight mt-4">
+        Sales and profit
+      </h2>
+      <div className="flex gap-8">
+        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
+          <SalesChart
+            items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
+          ></SalesChart>
+        </div>
+        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
+          <ProfitChart items={myItemsQuery.data || []}></ProfitChart>
+        </div>
+      </div>
+
       {/*Items section header*/}
-      <div className="relative border-b border-base-content pb-5 sm:pb-0">
+      <div className="relative border-b border-base-content py-5 sm:pb-0">
         <div className="md:flex md:items-center md:justify-between">
           <h3 className="font-semibold leading-6 text-base-content">
-            My Items
+            Inventory
           </h3>
           <div className="mt-3 flex md:absolute md:right-0 md:top-3 md:mt-0">
             <button
@@ -140,20 +154,6 @@ function Dashboard() {
         ></ItemsGrid>
       ))}
 
-      <h2 className="text-3xl font-bold leading-loose tracking-tight mt-4">
-        Sales and profit
-      </h2>
-      <div className="flex gap-8">
-        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
-          <SalesChart
-            items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
-          ></SalesChart>
-        </div>
-        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
-          <ProfitChart items={myItemsQuery.data || []}></ProfitChart>
-        </div>
-      </div>
-
       <dialog id="addItemModal" className="modal">
         <div className="modal-box w-11/12 max-w-5xl">
           <form method="dialog">
@@ -193,6 +193,6 @@ function Dashboard() {
           <button>close</button>
         </form>
       </dialog>
-    </div>
+    </>
   );
 }
