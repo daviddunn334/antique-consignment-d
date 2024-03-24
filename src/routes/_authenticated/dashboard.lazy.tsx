@@ -4,14 +4,17 @@ import {
   ClipboardDocumentListIcon,
   CurrencyDollarIcon,
 } from "@heroicons/react/24/solid";
-import ProductForm, { ProductFormData } from "../../components/productForm.tsx";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "../../lib/supabase.ts";
-import Item, { getDefaultImage } from "../../lib/models/item.ts";
+import ProductForm from "../../components/productForm.tsx";
+import Item from "../../lib/models/item.ts";
 import { User, UserContext } from "../../components/auth-provider.tsx";
 import { useContext, useState } from "react";
 import ItemsGrid from "../../components/items-grid.tsx";
 import SalesChart from "../../components/sales-chart.tsx";
+import {
+  useAddItemMutation,
+  useEditItemMutation,
+  useMyItems,
+} from "./-dashboardHooks.ts";
 
 export const Route = createLazyFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -26,39 +29,6 @@ const filters: Filter[] = [
   { name: "Sold", filter: (item: Item) => item.soldAt != null },
 ];
 
-const useMyItems = (user: User) =>
-  useQuery({
-    queryKey: ["myItems"],
-    queryFn: async () => {
-      const data = (
-        await supabase
-          .from("inventory_item")
-          .select("*")
-          .eq("consigner_id", user.id)
-          .throwOnError()
-      ).data;
-      data?.forEach(
-        (item) => (item.imageUrl = item.imageUrl || getDefaultImage()),
-      );
-      return data;
-    },
-    select: (data): Item[] =>
-      data?.map((supaItem) => {
-        if (!supaItem.imageUrl) throw new Error("No default image set");
-        return {
-          id: supaItem.id,
-          name: supaItem.name,
-          price: supaItem.price,
-          consignerCost: supaItem.cost,
-          description: supaItem.description,
-          imageUrl: supaItem.imageUrl,
-          soldAt: supaItem.sold_at ? new Date(supaItem.sold_at) : null,
-          boothId: supaItem.booth_id || "",
-          categories: [],
-        };
-      }) || [],
-  });
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -67,78 +37,10 @@ function Dashboard() {
   const user: User | undefined = useContext(UserContext);
   if (!user) throw new Error("User not found");
 
-  const queryClient = useQueryClient();
   const myItemsQuery = useMyItems(user);
 
-  const addItemMutation = useMutation({
-    mutationFn: async (data: ProductFormData & { userId: string }) =>
-      await supabase
-        .from("inventory_item")
-        .insert([
-          {
-            name: data.name,
-            price: data.price,
-            cost: data.consignerCost,
-            description: data.description,
-            consigner_id: data.userId,
-          },
-        ])
-        .select()
-        .single()
-        .throwOnError(),
-    onSuccess: (response) => {
-      queryClient.setQueryData(["myItems"], (oldData: any[]) => {
-        if (!response.data)
-          throw new Error("No data returned from addItemMutation");
-        response.data.imageUrl ??= getDefaultImage();
-        return oldData ? [...oldData, response.data] : [response.data];
-      });
-      (document.getElementById("addItemModal") as HTMLDialogElement).close();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-  const editItemMutation = useMutation({
-    mutationFn: async (data: any & { userId: string }) => {
-      if (!data.id) throw new Error("Item id is required");
-      return supabase
-        .from("inventory_item")
-        .update({
-          id: data.id,
-          name: data.name,
-          price: data.price,
-          cost: data.consignerCost,
-          description: data.description,
-          consigner_id: data.userId,
-          sold_at: data.soldAt,
-        })
-        .eq("id", data.id)
-        .select()
-        .single()
-        .throwOnError();
-    },
-    onSuccess: (response) => {
-      queryClient.setQueryData(["myItems"], (oldData: any[]) => {
-        if (!response.data || !oldData)
-          throw new Error(
-            "No data returned from editItemMutation, or no data in my items query.",
-          );
-        const indexOfItem = oldData.findIndex((i) => i.id === response.data.id);
-        response.data.imageUrl ??=
-          oldData[indexOfItem].imageUrl || getDefaultImage();
-        return [
-          ...oldData.slice(0, indexOfItem),
-          response.data,
-          ...oldData.slice(indexOfItem + 1),
-        ];
-      });
-      (document.getElementById("editItemModal") as HTMLDialogElement).close();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  const addItemMutation = useAddItemMutation();
+  const editItemMutation = useEditItemMutation();
 
   const [itemToEdit, setItemToEdit] = useState<Item | undefined>(undefined);
   const [currentFilter, setCurrentFilter] = useState<Filter>(filters[0]);
