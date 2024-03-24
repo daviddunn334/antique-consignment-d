@@ -56,7 +56,7 @@ export function useAddItemMutation() {
         .select()
         .single()
         .throwOnError(),
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
       queryClient.setQueryData(["myItems"], (oldData: any[]) => {
         if (!response.data)
           throw new Error("No data returned from addItemMutation");
@@ -65,7 +65,7 @@ export function useAddItemMutation() {
       });
       (document.getElementById("addItemModal") as HTMLDialogElement).close();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.error(error);
     },
   });
@@ -92,7 +92,7 @@ export function useEditItemMutation() {
         .single()
         .throwOnError();
     },
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
       queryClient.setQueryData(["myItems"], (oldData: any[]) => {
         if (!response.data || !oldData)
           throw new Error(
@@ -109,7 +109,7 @@ export function useEditItemMutation() {
       });
       (document.getElementById("editItemModal") as HTMLDialogElement).close();
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.error(error);
     },
   });
