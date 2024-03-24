@@ -62,8 +62,11 @@ export default function SalesChart({ items }: { items: Item[] }) {
   const secondaryAxes = React.useMemo(
     (): AxisOptions<CumulativeAmount>[] => [
       {
-        getValue: (datum) => "$" + datum.amount,
+        getValue: (datum) => datum.amount,
         elementType: "line",
+        formatters: {
+          scale: (value: string) => "$" + value,
+        },
       },
     ],
     [data],
