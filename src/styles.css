@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-h1, h2 {
+header, h1{
     @apply font-heading
 }
 
-h3, h4, h5, h6, button {
+h2, h3, h4, h5, h6, button {
     @apply font-button
 }
 
-:not(h1, h2, h3, h4, h5, h6, button) {
+:not(header, h1, h2, h3, h4, h5, h6, button) {
     @apply font-body
 }

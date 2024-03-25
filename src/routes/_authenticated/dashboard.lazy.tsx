@@ -5,13 +5,12 @@ import { User, UserContext } from "../../components/auth-provider.tsx";
 import { useContext, useState } from "react";
 import ItemsGrid from "../../components/items-grid.tsx";
 import SalesChart from "../../components/data-display/sales-chart.tsx";
+import PersonalStats from "../../components/data-display/personal-stats.tsx";
 import {
   useAddItemMutation,
   useEditItemMutation,
   useMyItems,
-} from "./-dashboardHooks.ts";
-import PersonalStats from "../../components/data-display/personal-stats.tsx";
-import ProfitChart from "../../components/data-display/profit-chart.tsx";
+} from "../../lib/itemHooks.ts";
 
 export const Route = createLazyFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -67,17 +66,12 @@ function Dashboard() {
       {/*Stat Section*/}
       <PersonalStats items={myItemsQuery.data || []}></PersonalStats>
 
-      <h2 className="text-3xl font-bold tracking-tight mt-4">
-        Sales and profit
-      </h2>
+      <h2 className="text-3xl font-bold tracking-tight mt-4">Total Sales</h2>
       <div className="flex gap-8">
         <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
           <SalesChart
             items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
           ></SalesChart>
-        </div>
-        <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
-          <ProfitChart items={myItemsQuery.data || []}></ProfitChart>
         </div>
       </div>
 

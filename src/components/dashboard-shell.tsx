@@ -41,7 +41,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div className="w-full bg-base-100 py-2 mb-4">
+      <div className="w-full bg-base-100 py-2">
         <div className="flex justify-between items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="navbar-start items-center flex gap-2">
             <img
@@ -123,7 +123,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
 
       <div className="min-h-full">
         <main>
-          <div className="py-4 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col">
+          <div className="py-4 lg:py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col">
             <ThemeContext.Provider value={theme}>
               {children}
             </ThemeContext.Provider>

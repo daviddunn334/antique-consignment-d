@@ -22,6 +22,9 @@ const IndexLazyImport = createFileRoute('/')()
 const AuthenticatedDashboardLazyImport = createFileRoute(
   '/_authenticated/dashboard',
 )()
+const AuthenticatedAnalyticsLazyImport = createFileRoute(
+  '/_authenticated/analytics',
+)()
 
 // Create/Update Routes
 
@@ -49,6 +52,15 @@ const AuthenticatedDashboardLazyRoute = AuthenticatedDashboardLazyImport.update(
   import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
 )
 
+const AuthenticatedAnalyticsLazyRoute = AuthenticatedAnalyticsLazyImport.update(
+  {
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any,
+).lazy(() =>
+  import('./routes/_authenticated/analytics.lazy').then((d) => d.Route),
+)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -65,6 +77,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated/analytics': {
+      preLoaderRoute: typeof AuthenticatedAnalyticsLazyImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/dashboard': {
       preLoaderRoute: typeof AuthenticatedDashboardLazyImport
       parentRoute: typeof AuthenticatedImport
@@ -76,7 +92,10 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexLazyRoute,
-  AuthenticatedRoute.addChildren([AuthenticatedDashboardLazyRoute]),
+  AuthenticatedRoute.addChildren([
+    AuthenticatedAnalyticsLazyRoute,
+    AuthenticatedDashboardLazyRoute,
+  ]),
   LoginRoute,
 ])
 

@@ -1,8 +1,8 @@
-import { ProductFormData } from "../../components/productForm.tsx";
-import { supabase } from "../../lib/supabase.ts";
-import Item, { getDefaultImage } from "../../lib/models/item.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { User } from "../../components/auth-provider.tsx";
+import { supabase } from "./supabase.ts";
+import Item, { getDefaultImage } from "./models/item.ts";
+import { ProductFormData } from "../components/productForm.tsx";
+import { User } from "../components/auth-provider.tsx";
 
 export function useMyItems(user: User) {
   return useQuery({
