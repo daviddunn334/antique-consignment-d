@@ -15,7 +15,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedInventoryImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedAnalyticsImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAddItemImport } from './routes/_authenticated/add-item'
 
 // Create Virtual Routes
 
@@ -50,8 +53,23 @@ const AuthenticatedDashboardLazyRoute = AuthenticatedDashboardLazyImport.update(
   import('./routes/_authenticated/dashboard.lazy').then((d) => d.Route),
 )
 
+const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedInventoryRoute = AuthenticatedInventoryImport.update({
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsImport.update({
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedAddItemRoute = AuthenticatedAddItemImport.update({
+  path: '/add-item',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -71,8 +89,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated/add-item': {
+      preLoaderRoute: typeof AuthenticatedAddItemImport
+      parentRoute: typeof AuthenticatedImport
+    }
     '/_authenticated/analytics': {
       preLoaderRoute: typeof AuthenticatedAnalyticsImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/inventory': {
+      preLoaderRoute: typeof AuthenticatedInventoryImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/profile': {
+      preLoaderRoute: typeof AuthenticatedProfileImport
       parentRoute: typeof AuthenticatedImport
     }
     '/_authenticated/dashboard': {
@@ -87,7 +117,10 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexLazyRoute,
   AuthenticatedRoute.addChildren([
+    AuthenticatedAddItemRoute,
     AuthenticatedAnalyticsRoute,
+    AuthenticatedInventoryRoute,
+    AuthenticatedProfileRoute,
     AuthenticatedDashboardLazyRoute,
   ]),
   LoginRoute,
