@@ -14,6 +14,7 @@ const router = createRouter({
   defaultNotFoundComponent: NotFound,
   context: {
     user: undefined,
+    currentPageTitle: "Dashboard",
   },
 });
 

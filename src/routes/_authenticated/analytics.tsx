@@ -1,12 +1,17 @@
 import ProfitChart from "../../components/data-display/profit-chart.tsx";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { UserContext } from "../../components/auth-provider.tsx";
 import { useContext } from "react";
 import { useMyItems } from "../../lib/itemHooks.ts";
 import SalesChart from "../../components/data-display/sales-chart.tsx";
 
-export const Route = createLazyFileRoute("/_authenticated/analytics")({
+export const Route = createFileRoute("/_authenticated/analytics")({
   component: AnalyticsPage,
+  beforeLoad: () => {
+    return {
+      currentPageTitle: "Analytics",
+    };
+  },
 });
 
 function AnalyticsPage() {
@@ -16,7 +21,6 @@ function AnalyticsPage() {
 
   return (
     <>
-      <h1 className="text-2xl mb-4">Analytics</h1>
       <div className="flex flex-col gap-4">
         <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
           <h2 className="text-xl text-center">Sales</h2>

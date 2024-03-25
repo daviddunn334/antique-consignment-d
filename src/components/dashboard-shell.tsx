@@ -6,21 +6,21 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/solid";
 import { UserIcon } from "@heroicons/react/20/solid";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 
 export const ThemeContext = createContext<string>("light");
 
 const tabs = [
-  { name: "Dashboard", href: "/dashboard", current: true, icon: HomeIcon },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   {
     name: "Inventory",
     href: "/inventory",
     current: false,
     icon: ArchiveBoxIcon,
   },
-  { name: "Add Item", href: "/add-item", current: false, icon: PlusIcon },
-  { name: "Stats", href: "/analytics", current: false, icon: ChartBarIcon },
-  { name: "Profile", href: "/profile", current: false, icon: UserIcon },
+  { name: "Add Item", href: "/add-item", icon: PlusIcon },
+  { name: "Analytics", href: "/analytics", icon: ChartBarIcon },
+  { name: "Profile", href: "/profile", icon: UserIcon },
 ];
 
 // function logout() {
@@ -32,6 +32,8 @@ const tabs = [
 // }
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
+  const router = useRouterState();
+  const tab = tabs.find((t) => router.location.href.includes(t.href));
   const [theme, setTheme] = useState<string>(
     localStorage.getItem("theme") || "light",
   );
@@ -45,19 +47,29 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
         <div className="flex justify-between items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="navbar-start items-center flex gap-2">
             <img
-              className="h-8 w-auto"
+              className="h-8 w-auto hidden lg:block"
               src="https://i.imgur.com/RHsPcXa.png"
               alt="Seed Logo"
             />
-            <a className="text-2xl font-heading">Seed</a>
+            <a
+              className="text-2xl font-heading hidden lg:inline"
+              href={"/dashboard"}
+            >
+              Seed
+            </a>
+            <h1 className="text-2xl lg:hidden">{tab?.name}</h1>
           </div>
           <div className="flex-shrink-0 justify-center flex-grow hidden lg:flex">
             <ul className="menu menu-horizontal px-1 gap-4">
               {tabs.map(
                 (tab) =>
                   tab.name != "Profile" && (
-                    <li>
-                      <Link to={tab.href} activeProps={{ className: "active" }}>
+                    <li key={tab.name}>
+                      <Link
+                        to={tab.href}
+                        activeProps={{ className: "active" }}
+                        key={tab.name}
+                      >
                         {tab.name}
                       </Link>
                     </li>
@@ -137,6 +149,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
               <Link
                 to={tab.href}
                 activeProps={{ className: "active bg-primary/30" }}
+                key={tab.name}
               >
                 <tab.icon className="h-8 w-8 hover:scale-[1.05]" />
               </Link>
