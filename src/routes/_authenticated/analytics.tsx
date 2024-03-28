@@ -23,13 +23,13 @@ function AnalyticsPage() {
     <>
       <div className="flex flex-col gap-4">
         <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
-          <h2 className="text-xl text-center">Sales</h2>
+          <h2 className="text-xl text-center">Profit</h2>
           <ProfitChart
             items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
           ></ProfitChart>
         </div>
         <div className="card bg-base-200 shadow-xl w-full h-[26rem] p-4">
-          <h2 className="text-xl text-center">Profit</h2>
+          <h2 className="text-xl text-center">Sales</h2>
           <SalesChart
             items={myItemsQuery.data?.filter((i) => i.soldAt) || []}
           ></SalesChart>
