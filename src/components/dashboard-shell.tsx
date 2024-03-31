@@ -133,7 +133,7 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      <div className="min-h-full">
+      <div className="min-h-full max-w-screen overflow-x-hidden">
         <main>
           <div className="py-4 lg:py-8 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col">
             <ThemeContext.Provider value={theme}>

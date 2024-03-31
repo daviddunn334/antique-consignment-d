@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import ImagesUpload from "./form/images-upload.tsx";
 
 export type NewItemFormData = {
   id: string;
@@ -22,7 +23,7 @@ export default function NewItemForm({ handleData }: NewItemFormProps) {
         className="flex flex-col gap-4 align-baseline"
       >
         <input type="text" className="hidden invisible" {...register("id")} />
-        <input type="file" accept="image/*" capture="environment" />
+        <ImagesUpload></ImagesUpload>
         <label className="form-control w-full">
           <span className="label">Item name</span>
           <input
