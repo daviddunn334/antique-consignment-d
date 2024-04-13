@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "./supabase.ts";
-import Item, { getDefaultImage } from "./models/item.ts";
+import Item from "./models/item.ts";
 import { ProductFormData } from "../components/productForm.tsx";
 import { User } from "../components/auth-provider.tsx";
 
@@ -8,28 +8,40 @@ export function useMyItems(user: User) {
   return useQuery({
     queryKey: ["myItems"],
     queryFn: async () => {
-      const data = (
+      const items = (
         await supabase
           .from("inventory_item")
           .select("*")
           .eq("consigner_id", user.id)
           .throwOnError()
       ).data;
-      data?.forEach(
-        (item) => (item.imageUrl = item.imageUrl || getDefaultImage()),
-      );
-      return data;
+      const images =
+        (
+          await supabase
+            .from("item_image")
+            .select("item_id, image_path")
+            .in("item_id", items?.map((item) => item.id) || [""])
+            .throwOnError()
+        ).data || [];
+      console.log({ items, images });
+      return { items, images };
     },
     select: (data): Item[] =>
-      data?.map((supaItem) => {
-        if (!supaItem.imageUrl) throw new Error("No default image set");
+      data?.items?.map((supaItem) => {
         return {
           id: supaItem.id,
           name: supaItem.name,
           price: supaItem.price,
           consignerCost: supaItem.cost,
           description: supaItem.description,
-          imageUrl: supaItem.imageUrl,
+          imageUrls: data.images
+            .filter((img) => img.item_id === supaItem.id)
+            .map((img) => img.image_path)
+            .map(
+              (path) =>
+                supabase.storage.from("item-images").getPublicUrl(path).data
+                  .publicUrl,
+            ),
           soldAt: supaItem.sold_at ? new Date(supaItem.sold_at) : null,
           boothId: supaItem.booth_id || "",
           categories: [],
@@ -60,7 +72,6 @@ export function useAddItemMutation() {
       queryClient.setQueryData(["myItems"], (oldData: any[]) => {
         if (!response.data)
           throw new Error("No data returned from addItemMutation");
-        response.data.imageUrl ??= getDefaultImage();
         return oldData ? [...oldData, response.data] : [response.data];
       });
       (document.getElementById("addItemModal") as HTMLDialogElement).close();
@@ -99,8 +110,6 @@ export function useEditItemMutation() {
             "No data returned from editItemMutation, or no data in my items query.",
           );
         const indexOfItem = oldData.findIndex((i) => i.id === response.data.id);
-        response.data.imageUrl ??=
-          oldData[indexOfItem].imageUrl || getDefaultImage();
         return [
           ...oldData.slice(0, indexOfItem),
           response.data,

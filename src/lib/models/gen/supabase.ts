@@ -17,7 +17,6 @@ export type Database = {
           created_at: string | null
           description: string
           id: string
-          imageUrl: string | null
           name: string
           price: number
           sold_at: string | null
@@ -29,7 +28,6 @@ export type Database = {
           created_at?: string | null
           description: string
           id?: string
-          imageUrl?: string | null
           name: string
           price: number
           sold_at?: string | null
@@ -41,7 +39,6 @@ export type Database = {
           created_at?: string | null
           description?: string
           id?: string
-          imageUrl?: string | null
           name?: string
           price?: number
           sold_at?: string | null
@@ -56,26 +53,28 @@ export type Database = {
           },
         ]
       }
-      sold_items: {
+      item_image: {
         Row: {
-          date_sold: string | null
-          items_id: number | null
-          price: number | null
-          sold_items_id: number
+          image_path: string
+          item_id: string
         }
         Insert: {
-          date_sold?: string | null
-          items_id?: number | null
-          price?: number | null
-          sold_items_id?: number
+          image_path: string
+          item_id: string
         }
         Update: {
-          date_sold?: string | null
-          items_id?: number | null
-          price?: number | null
-          sold_items_id?: number
+          image_path?: string
+          item_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_item_image_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_item"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

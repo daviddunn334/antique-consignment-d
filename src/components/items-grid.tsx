@@ -36,13 +36,17 @@ export default function ItemsGrid({
               className="card backface-hidden card-compact max-w-96 bg-primary text-primary-content shadow-xl hover:translate-y-2 hover:-rotate-1 hover:scale-105 hover:shadow-2xl"
               key={item.id}
             >
-              <figure className="h-60">
-                <img
-                  className="object-cover h-full w-full"
-                  src={item.imageUrl}
-                  alt=""
-                />
-              </figure>
+              {item.imageUrls.length ? (
+                <figure className="h-60">
+                  <img
+                    className="object-cover h-full w-full"
+                    src={item.imageUrls[0]}
+                    alt=""
+                  />
+                </figure>
+              ) : (
+                ""
+              )}
               <div className="card-body">
                 <h2 className="card-title w-full flex space-between">
                   {item.name}

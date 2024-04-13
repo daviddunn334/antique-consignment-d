@@ -18,6 +18,7 @@ function AddItemPage() {
   const user = useContext(UserContext);
   if (!user) throw new Error("User not found");
 
+  // TODO: Move this logic into the add and update mutation item hooks
   async function createItem(data: NewItemFormData) {
     const createdItem = (
       await supabase
